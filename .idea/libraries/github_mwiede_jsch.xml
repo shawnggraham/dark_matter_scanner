@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="github.mwiede.jsch" type="repository">
+    <properties maven-id="com.github.mwiede:jsch:2.27.9" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jsch-2.27.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

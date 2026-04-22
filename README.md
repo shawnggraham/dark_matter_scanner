@@ -82,6 +82,58 @@ java -cp "out/classes:lib/*" dark_matter_scanner.MainApp
 - [`lib/dark-matter-pgsql-schema.sql`](lib/dark-matter-pgsql-schema.sql): PostgreSQL schema dump.
 - [`docs/uml/high-level-components.puml`](docs/uml/high-level-components.puml): high-level architecture diagram.
 
+## High-level UML
+
+Source of truth: [`docs/uml/high-level-components.puml`](docs/uml/high-level-components.puml)
+
+```plantuml
+@startuml
+title Dark Matter Scanner - High-Level Component Diagram
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Operator" as user
+
+package "Desktop App (JVM)" {
+  [MainApp] as main
+  [ActionPanelManager] as actionPanel
+  [TopologyGraphPanel] as topoPanel
+
+  [ScanExecutor] as scanExec
+  [SshExecutor] as sshExec
+  [TcpdumpParserService] as parser
+  [FeatureAnalysisService] as analysis
+  [DeviceHeuristics] as heuristics
+  [DatabaseService] as db
+}
+
+database "PostgreSQL\n(dark_matter_scanner)" as pg
+node "SSH Target Host" as sshHost
+node "Local Host Tools\n(arp-scan, tcpdump, nmap)" as localTools
+
+user --> main : Uses UI
+main --> actionPanel : Builds dynamic action controls
+main --> topoPanel : Renders topology
+
+main --> scanExec : Run scans/captures
+main --> parser : Parse tcpdump output
+main --> analysis : Query analytics
+main --> heuristics : Classify observations
+main --> db : Persist/load run data
+
+analysis --> db : Read/aggregate data
+db --> parser : Parse capture rows when needed
+
+scanExec --> localTools : Local command execution
+scanExec --> sshHost : Remote command execution (SSH)
+sshExec --> sshHost : SNMP/remote commands
+
+db --> pg : JDBC
+
+@enduml
+```
+
 ## Notes
 
 - Defaults in the UI include sample SSH credentials/host and subnet; treat them as development placeholders.
